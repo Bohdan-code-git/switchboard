@@ -1,6 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { ConnectionDto, ConnectionStatus, ConnectionsResponse, ProviderKey, WorkspaceApi } from '../workspace-api.service';
-import { SAMPLE_CONTRACTS, buildSampleWorkspace } from './sample-workspace';
 
 const PROVIDER_ORDER: ProviderKey[] = ['google', 'github', 'discord'];
 // Render's free plan sleeps when idle; after this long the page explains the wait.
@@ -20,12 +19,9 @@ export class Home {
   readonly busy = signal<ProviderKey | null>(null);
   readonly notice = signal<{ message: string; error: boolean } | null>(null);
   readonly slowLoad = signal(false);
-  readonly sampleMode = signal(false);
-  readonly sample = signal<ConnectionsResponse | null>(null);
-  readonly view = computed(() => this.sampleMode() ? this.sample() : this.snapshot());
-  readonly demoMode = computed(() => !this.sampleMode() && (this.snapshot()?.demoMode ?? false));
+  readonly demoMode = computed(() => this.snapshot()?.demoMode ?? false);
   readonly connectionSummary = computed(() => {
-    const connections = this.view()?.connections ?? [];
+    const connections = this.snapshot()?.connections ?? [];
     return {
       connected: connections.filter((item) => item.status === 'connected').length,
       attention: connections.filter((item) => item.status === 'reauth_required').length,
@@ -35,7 +31,6 @@ export class Home {
 
   constructor() {
     this.consumeOAuthResult();
-    if (new URLSearchParams(window.location.search).get('sample') === '1') this.enterSample();
     this.loadWorkspace();
   }
 
@@ -68,25 +63,11 @@ export class Home {
     });
   }
 
-  enterSample(): void {
-    const contracts = this.snapshot()?.oauthProviders;
-    this.sample.set(buildSampleWorkspace(Date.now(), contracts?.length ? contracts : SAMPLE_CONTRACTS));
-    this.sampleMode.set(true);
-    this.notice.set(null);
-  }
-
-  exitSample(): void {
-    this.sampleMode.set(false);
-    this.sample.set(null);
-    this.notice.set(null);
-  }
-
   connectionFor(provider: ProviderKey): ConnectionDto | null {
-    return this.view()?.connections.find((item) => item.provider === provider) ?? null;
+    return this.snapshot()?.connections.find((item) => item.provider === provider) ?? null;
   }
 
   startConnection(provider: ProviderKey): void {
-    if (this.sampleMode()) return;
     this.api.startProvider(provider);
   }
 
@@ -114,7 +95,7 @@ export class Home {
   }
 
   oauthContractFor(provider: ProviderKey) {
-    return this.view()?.oauthProviders?.find((item) => item.provider === provider) ?? null;
+    return this.snapshot()?.oauthProviders?.find((item) => item.provider === provider) ?? null;
   }
 
   pkceLabel(provider: ProviderKey): string {
@@ -196,10 +177,6 @@ export class Home {
   verifyGrant(provider: ProviderKey): void {
     const connection = this.connectionFor(provider);
     if (!connection || connection.status !== 'connected' || this.busy()) return;
-    if (this.sampleMode()) {
-      this.simulateSampleCheck(connection);
-      return;
-    }
     this.busy.set(provider);
     this.api.refreshConnection(provider).subscribe({
       next: (response) => {
@@ -221,7 +198,7 @@ export class Home {
   }
 
   disconnect(connection: ConnectionDto): void {
-    if (this.sampleMode() || this.busy() || connection.status === 'not_connected' || connection.status === 'not_configured')
+    if (this.busy() || connection.status === 'not_connected' || connection.status === 'not_configured')
       return;
     if (!window.confirm(`Remove the ${connection.label} connection from this browser?`)) return;
     this.busy.set(connection.provider);
@@ -243,21 +220,6 @@ export class Home {
     const selected = units.find(([, threshold]) => elapsedSeconds >= threshold) ?? ['second', 1];
     return new Intl.RelativeTimeFormat('en', { numeric: 'auto' })
       .format(-Math.floor(elapsedSeconds / selected[1]), selected[0]);
-  }
-
-  private simulateSampleCheck(connection: ConnectionDto): void {
-    const current = this.sample();
-    if (!current) return;
-    const checkedAt = new Date().toISOString();
-    this.sample.set({
-      ...current,
-      connections: current.connections.map((item) =>
-        item.provider === connection.provider ? { ...item, lastSyncedAt: checkedAt } : item),
-    });
-    this.notice.set({
-      message: `${connection.label} grant checked. This is sample data, so no request left your browser.`,
-      error: false,
-    });
   }
 
   private consumeOAuthResult(): void {

@@ -20,25 +20,11 @@
 }
 
 .brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
   color: var(--ink);
   font-family: var(--display);
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -.01em;
+  font-size: 22px;
+  font-weight: 500;
   text-decoration: none;
-}
-
-.brand-mark {
-  width: 22px;
-  height: 22px;
-  border-radius: 7px;
-  background:
-    radial-gradient(circle at 30% 50%, var(--accent-ink) 0 2.5px, transparent 3px),
-    radial-gradient(circle at 70% 50%, var(--accent-ink) 0 2.5px, transparent 3px),
-    var(--accent);
 }
 
 .topnav {
@@ -68,22 +54,12 @@
   padding: 44px 0 28px;
 }
 
-.eyebrow {
-  margin: 0 0 12px;
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
 h1 {
   margin: 0;
   font-family: var(--display);
-  font-size: clamp(30px, 4.6vw, 48px);
-  font-weight: 700;
+  font-size: clamp(34px, 5vw, 48px);
+  font-weight: 500;
   line-height: 1.08;
-  letter-spacing: -.035em;
 }
 
 .intro-copy {
@@ -94,23 +70,13 @@ h1 {
   line-height: 1.55;
 }
 
-.intro-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 20px;
-  margin-top: 22px;
-}
-
 .flow-note {
   display: grid;
   gap: 5px;
   max-width: 290px;
   margin: 0;
-  padding: 14px 16px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--surface);
+  padding-left: 14px;
+  border-left: 2px solid var(--line);
   color: var(--ink);
   font-size: 13px;
   line-height: 1.45;
@@ -121,38 +87,20 @@ h1 {
 }
 
 /* Banners and states */
-.sample-banner,
 .mode-note,
 .notice,
 .page-state {
   margin: 0 0 18px;
   padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 8px;
   background: var(--surface);
   color: var(--muted);
   font-size: 14px;
   line-height: 1.5;
 }
 
-.sample-banner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px 20px;
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
-  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
-  color: var(--ink);
-}
-
-.sample-banner p {
-  margin: 0;
-  max-width: 70ch;
-}
-
-.mode-note strong,
-.sample-banner strong {
+.mode-note strong {
   color: var(--ink);
 }
 
@@ -186,35 +134,12 @@ h1 {
   color: var(--ink);
 }
 
-.state-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.skeleton-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.skeleton-grid span {
-  height: 260px;
-  border-radius: 14px;
-  background: linear-gradient(100deg, var(--surface) 30%, var(--surface-2) 50%, var(--surface) 70%) 0 0 / 300% 100%;
-  animation: shimmer 1.6s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  to { background-position: -150% 0; }
-}
-
 /* Summary */
 .connection-summary {
   margin: 0 0 20px;
   padding: 18px 20px;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 8px;
   background: var(--surface);
 }
 
@@ -244,15 +169,9 @@ h1 {
 
 .summary-item strong {
   color: var(--ink);
-  font-family: var(--display);
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -.02em;
-}
-
-.summary-item--ok strong {
-  color: var(--ok);
 }
 
 .summary-item--attention strong {
@@ -276,33 +195,15 @@ h1 {
   padding: 22px 20px 20px;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 8px;
   background: var(--surface);
-}
-
-.connection-card::before {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 4px;
-  background: var(--line);
-  content: "";
-}
-
-.connection-card--ok::before {
-  background: var(--ok);
-}
-
-.connection-card--attention::before {
-  background: var(--warn);
 }
 
 .card-heading h2 {
   margin: 0;
-  font-family: var(--display);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.25;
-  letter-spacing: -.02em;
 }
 
 .status {
@@ -357,11 +258,10 @@ h1 {
 .avatar-fallback {
   display: grid;
   place-items: center;
-  background: color-mix(in srgb, var(--accent) 16%, var(--surface));
-  color: var(--accent);
-  font-family: var(--display);
+  background: var(--surface-2);
+  color: var(--muted);
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .profile-name {
@@ -499,7 +399,7 @@ h1 {
   min-height: 40px;
   padding: 8px 14px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 6px;
   background: var(--surface);
   color: var(--ink);
   font: inherit;
@@ -510,9 +410,9 @@ h1 {
 }
 
 .button--primary {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--accent-ink);
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--bg);
 }
 
 .button:hover:not(:disabled) {
@@ -520,9 +420,7 @@ h1 {
 }
 
 .button--primary:hover:not(:disabled) {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: var(--bg);
+  opacity: .85;
 }
 
 .button:disabled {
@@ -556,39 +454,23 @@ h1 {
 }
 
 .how h2 {
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   font-family: var(--display);
-  font-size: clamp(22px, 3vw, 30px);
-  font-weight: 700;
-  letter-spacing: -.03em;
+  font-size: 30px;
+  font-weight: 500;
 }
 
 .how-steps {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 24px;
   margin: 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: step;
+  padding-left: 20px;
 }
 
 .how-steps li {
   display: grid;
-  gap: 8px;
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--surface);
-  counter-increment: step;
-}
-
-.how-steps li::before {
-  color: var(--accent);
-  font-family: var(--display);
-  font-size: 13px;
-  font-weight: 700;
-  content: "0" counter(step);
+  gap: 6px;
 }
 
 .how-steps strong {
@@ -620,14 +502,10 @@ h1 {
 
 @media (max-width: 860px) {
   .account-grid,
-  .skeleton-grid,
   .how-steps {
     grid-template-columns: 1fr;
   }
 
-  .skeleton-grid span:nth-child(n + 2) {
-    display: none;
-  }
 }
 
 @media (max-width: 560px) {

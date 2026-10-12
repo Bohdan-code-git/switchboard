@@ -4,7 +4,7 @@ Switchboard is a portfolio case study for independent creators and developers wh
 
 It demonstrates OAuth 2.0 authorization code flows and a backend-for-frontend (BFF). It does not claim measured time savings, real users, conversion results, revenue or production readiness.
 
-**Live:** https://switchboard.bogkor906.workers.dev · **Without connecting your own accounts:** [open it with sample data](https://switchboard.bogkor906.workers.dev/?sample=1). The sample account is made up and nothing is sent to the providers.
+**Live:** https://switchboard.bogkor906.workers.dev
 
 ## Product and scope
 
