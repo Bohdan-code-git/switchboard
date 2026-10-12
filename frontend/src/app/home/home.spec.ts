@@ -1,6 +1,6 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
+import { NEVER, of, throwError } from 'rxjs';
 import { ConnectionDto, ConnectionsResponse, WorkspaceApi } from '../workspace-api.service';
 import { Home } from './home';
 
@@ -269,5 +269,87 @@ describe('Home', () => {
 
     expect(api.loadWorkspace).toHaveBeenCalledTimes(2);
     expect(fixture.nativeElement.querySelectorAll('.connection-card').length).toBe(3);
+  });
+  it('shows made-up sample accounts only after the visitor asks for them', () => {
+    const api = jasmine.createSpyObj<WorkspaceApi>('WorkspaceApi', ['loadWorkspace', 'refreshConnection', 'disconnect', 'startProvider']);
+    api.loadWorkspace.and.returnValue(of(snapshot));
+    const fixture = createHome(api);
+    const element = fixture.nativeElement as HTMLElement;
+    expect(element.textContent).not.toContain('Alex Morgan');
+
+    (element.querySelector('.sample-toggle') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(element.querySelector('.sample-banner')?.textContent).toContain('Sample data');
+    expect(element.querySelector('[data-provider="google"]')?.textContent).toContain('Alex Morgan');
+    expect(element.querySelector('[data-provider="github"]')?.textContent).toContain('Needs authorization');
+    expect(element.querySelector('.connection-summary')?.textContent).toContain('1 / 3');
+    const connect = element.querySelector('[data-provider="discord"] .connect-action') as HTMLButtonElement;
+    expect(connect.disabled).toBeTrue();
+    connect.click();
+    expect(api.startProvider).not.toHaveBeenCalled();
+  });
+
+  it('simulates a grant check in sample mode without calling the API', () => {
+    const api = jasmine.createSpyObj<WorkspaceApi>('WorkspaceApi', ['loadWorkspace', 'refreshConnection', 'disconnect', 'startProvider']);
+    api.loadWorkspace.and.returnValue(of(snapshot));
+    const fixture = createHome(api);
+    const element = fixture.nativeElement as HTMLElement;
+    (element.querySelector('.sample-toggle') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    (element.querySelector('[data-provider="google"] .verify-grant') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(api.refreshConnection).not.toHaveBeenCalled();
+    expect(element.querySelector('.notice')?.textContent).toContain('sample data');
+    expect(element.querySelector('[data-provider="google"] .freshness')?.textContent).toContain('now');
+  });
+
+  it('returns to the real workspace when the visitor leaves sample mode', () => {
+    const api = jasmine.createSpyObj<WorkspaceApi>('WorkspaceApi', ['loadWorkspace', 'refreshConnection', 'disconnect', 'startProvider']);
+    api.loadWorkspace.and.returnValue(of(snapshot));
+    const fixture = createHome(api);
+    const element = fixture.nativeElement as HTMLElement;
+    (element.querySelector('.sample-toggle') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    (element.querySelector('.sample-exit') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(element.querySelector('.sample-banner')).toBeNull();
+    expect(element.textContent).not.toContain('Alex Morgan');
+    expect(element.querySelector('[data-provider="discord"]')?.textContent).toContain('Mira Dev');
+  });
+
+  it('opens sample mode straight from a ?sample=1 link', () => {
+    window.history.replaceState({}, '', '/?sample=1');
+    try {
+      const api = jasmine.createSpyObj<WorkspaceApi>('WorkspaceApi', ['loadWorkspace', 'refreshConnection', 'disconnect', 'startProvider']);
+      api.loadWorkspace.and.returnValue(of(snapshot));
+      const fixture = createHome(api);
+      expect(fixture.nativeElement.querySelector('.sample-banner')).not.toBeNull();
+    } finally {
+      window.history.replaceState({}, '', '/');
+    }
+  });
+
+  it('explains a slow first load and offers sample accounts meanwhile', () => {
+    jasmine.clock().install();
+    try {
+      const api = jasmine.createSpyObj<WorkspaceApi>('WorkspaceApi', ['loadWorkspace', 'refreshConnection', 'disconnect', 'startProvider']);
+      api.loadWorkspace.and.returnValue(NEVER);
+      const fixture = createHome(api);
+      const element = fixture.nativeElement as HTMLElement;
+      expect(element.textContent).not.toContain('Waking up the API');
+
+      jasmine.clock().tick(3000);
+      fixture.detectChanges();
+
+      expect(element.querySelector('.page-state')?.textContent).toContain('Waking up the API');
+      expect(element.querySelector('.page-state .sample-toggle')).not.toBeNull();
+    } finally {
+      jasmine.clock().uninstall();
+    }
   });
 });
